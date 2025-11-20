@@ -9,6 +9,7 @@ namespace FreelancerInvoicing.Services.Users
 {
     public interface IUsersService : IBaseService<User>
     {
+        Task<IEnumerable<User>> GetAllAsyncService(); 
         Task<User> GetObjByIdService(int id);
         Task AddObjService(User user);
         Task ModifyObjService(User user);

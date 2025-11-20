@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FreelancerInvoicing.Models.Entities;
 using FreelancerInvoicing.Models.Interfaces;
 
 namespace FreelancerInvoicing.Services
@@ -14,6 +15,10 @@ namespace FreelancerInvoicing.Services
         public BaseService(IObjectRepository<T> objectRepository)
         {
             _objectRepository = objectRepository;
+        }
+        public virtual async Task<IEnumerable<T>> GetAllAsyncService()
+        {
+            return await _objectRepository.GetAllAsync();
         }
 
         public virtual async Task<T?> GetObjByIdService(int id)

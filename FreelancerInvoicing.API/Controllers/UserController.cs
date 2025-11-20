@@ -16,6 +16,22 @@ namespace FreelancerInvoicing.API.Controllers
             _userService = userService;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<User>>> GetAll(int id)
+        {
+            ActionResult<IEnumerable<User>> result;
+            IEnumerable<User> users = await _userService.GetAllAsyncService();
+            if (users == null)
+            {
+                result = NotFound();
+            }
+            else
+            {
+                result = Ok(users);
+            }
+            return result;
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetById(int id)
         {
