@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using FreelancerInvoicing.Models.Interfaces;
+using FreelancerInvoicing.Models.Entities;
 
 namespace FreelancerInvoicing.Repositories.Repositories
 {
@@ -20,6 +21,11 @@ namespace FreelancerInvoicing.Repositories.Repositories
             _dbSet = context.Set<T>();
         }
 
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            return await _dbSet.ToListAsync();
+        }
+
         public async Task<T> GetObjByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
@@ -33,8 +39,15 @@ namespace FreelancerInvoicing.Repositories.Repositories
 
         public async Task ModifyObjAsync(T entity)
         {
-            _dbSet.Update(entity);
-            await _context.SaveChangesAsync();
+            if (entity != null)
+            {
+                _dbSet.Update(entity);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new KeyNotFoundException($"{entity.GetType} not found.");
+            }
         }
 
         public async Task DeletObjAsync(int id)
@@ -44,6 +57,10 @@ namespace FreelancerInvoicing.Repositories.Repositories
             {
                 _dbSet.Remove(entity);
                 await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new KeyNotFoundException($"Entity with id {id} not found.");
             }
         }
     }
