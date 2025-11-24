@@ -7,45 +7,36 @@ using FreelancerInvoicing.Models.Entities;
 using FreelancerInvoicing.Repositories;
 using FreelancerInvoicing.Repositories.Interfaces;
 using FreelancerInvoicing.Services.Interfaces;
-using FreelancerInvoicing.Services.Users.Tools;
+using Microsoft.EntityFrameworkCore;
 
 namespace FreelancerInvoicing.Services.Users
 {
     public class UsersService : BaseService<User>, IUsersService
     {
-        private IObjectRepository<User> _userRepository;
-        public UsersService(IObjectRepository<User> userRepository) : base(userRepository) 
+        private IUserRepository _userRepository;
+        public UsersService(IUserRepository userRepository) : base(userRepository) 
         {
             _userRepository = userRepository;
         }
-        public virtual async Task AddObjService(User user)
+
+        public async Task<User> FindUserByEmailServiceAsync(String email)
         {
-            await _userRepository.AddObjAsync(user);
+            User result;
+            result = await _userRepository.FindUserByEmailAsync(email);
+            return result;
         }
-        public virtual async Task ModifyObjService(User user)
+        public async Task<User> FindUserBySiretServiceAsync(String siret)
         {
-            await _userRepository.ModifyObjAsync(user);
+            User result;
+            result = await _userRepository.FindUserBySiretAsync(siret);
+            return result;
         }
 
-        public async Task GetByEmail(String email)
+        public async Task<IEnumerable<User>> FindUsersByNameServiceAsync(String name)
         {
-            User resultUser=null;
-            IEnumerable<User> users = await _userRepository.GetAllAsync();
-            foreach (User user in users) 
-            {
-                if (user.Email.Equals(email))
-                {
-                    resultUser = user;
-                }
-            }
-            if (resultUser != null)
-            {
-                await _userRepository.GetObjByIdAsync(resultUser.UserId);
-            }
-            else
-            {
-
-            }
+            IEnumerable<User> results;
+            results = await _userRepository.FindUsersByNameAsync(name);
+            return results;
         }
     }
 }
