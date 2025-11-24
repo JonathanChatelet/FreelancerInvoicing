@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FreelancerInvoicing.Models.Entities;
 
-[Index("Email", Name = "UQ__Costumer__A9D10534CD372601", IsUnique = true)]
-public partial class Costumer
+[Index("Email", Name = "UQ__Customer__A9D10534CD372601", IsUnique = true)]
+public partial class Customer
 {
     [Key]
-    public int CostumerId { get; set; }
+    public int CustomerId { get; set; }
 
     public int UserId { get; set; }
 
@@ -37,13 +37,13 @@ public partial class Costumer
     [StringLength(14)]
     public string? Vatnr { get; set; }
 
-    [InverseProperty("Costumer")]
+    [InverseProperty("Customer")]
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
 
-    [InverseProperty("Costumer")]
+    [InverseProperty("Customer")]
     public virtual ICollection<Quote> Quotes { get; set; } = new List<Quote>();
 
     [ForeignKey("UserId")]
-    [InverseProperty("Costumers")]
+    [InverseProperty("Customers")]
     public virtual User User { get; set; } = null!;
 }

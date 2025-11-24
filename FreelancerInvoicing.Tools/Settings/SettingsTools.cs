@@ -14,7 +14,7 @@ namespace FreelancerInvoicing.Tools.Settings
         static SettingsTools()
         {
             _configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\..\\FreelancerInvoicing.Tools\\Settings"))
+                .SetBasePath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\..\\FreelancerInvoicing.API"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
         }

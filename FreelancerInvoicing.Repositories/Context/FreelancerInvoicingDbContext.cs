@@ -16,7 +16,7 @@ public partial class FreelancerInvoicingDbContext : DbContext
     {
     }
 
-    public virtual DbSet<Costumer> Costumers { get; set; }
+    public virtual DbSet<Customer> Customers { get; set; }
 
     public virtual DbSet<Invoice> Invoices { get; set; }
 
@@ -36,16 +36,16 @@ public partial class FreelancerInvoicingDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Costumer>(entity =>
+        modelBuilder.Entity<Customer>(entity =>
         {
-            entity.HasKey(e => e.CostumerId).HasName("PK__Costumer__8E5D69B06582650D");
+            entity.HasKey(e => e.CustomerId).HasName("PK__Customer__8E5D69B06582650D");
 
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.IsFrench).HasDefaultValue(true);
 
-            entity.HasOne(d => d.User).WithMany(p => p.Costumers)
+            entity.HasOne(d => d.User).WithMany(p => p.Customers)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Costumers__UserI__29572725");
+                .HasConstraintName("FK__Customers__UserI__29572725");
         });
 
         modelBuilder.Entity<Invoice>(entity =>
@@ -55,9 +55,9 @@ public partial class FreelancerInvoicingDbContext : DbContext
             entity.Property(e => e.Date).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Status).HasDefaultValue(1);
 
-            entity.HasOne(d => d.Costumer).WithMany(p => p.Invoices)
+            entity.HasOne(d => d.Customer).WithMany(p => p.Invoices)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Invoices__Costum__37A5467C");
+                .HasConstraintName("FK__Invoices__Custom__37A5467C");
 
             entity.HasOne(d => d.Quote).WithMany(p => p.Invoices).HasConstraintName("FK__Invoices__QuoteI__38996AB5");
 
@@ -95,9 +95,9 @@ public partial class FreelancerInvoicingDbContext : DbContext
             entity.Property(e => e.Date).HasDefaultValueSql("(getdate())");
             entity.Property(e => e.Status).HasDefaultValue(1);
 
-            entity.HasOne(d => d.Costumer).WithMany(p => p.Quotes)
+            entity.HasOne(d => d.Customer).WithMany(p => p.Quotes)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Quotes__Costumer__31EC6D26");
+                .HasConstraintName("FK__Quotes__Customer__31EC6D26");
 
             entity.HasOne(d => d.User).WithMany(p => p.Quotes)
                 .OnDelete(DeleteBehavior.ClientSetNull)
