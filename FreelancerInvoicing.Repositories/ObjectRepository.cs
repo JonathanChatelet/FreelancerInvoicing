@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using FreelancerInvoicing.Models.Interfaces;
 using FreelancerInvoicing.Models.Entities;
+using FreelancerInvoicing.Repositories.Interfaces;
 
-namespace FreelancerInvoicing.Repositories.Repositories
+namespace FreelancerInvoicing.Repositories
 {
     public class ObjectRepository<T> : IObjectRepository<T> where T : class
     {
@@ -21,23 +21,23 @@ namespace FreelancerInvoicing.Repositories.Repositories
             _dbSet = context.Set<T>();
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllObjectAsync()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T> GetObjByIdAsync(int id)
+        public async Task<T> GetObjectByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task AddObjAsync(T entity)
+        public async Task AddObjectAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task ModifyObjAsync(T entity)
+        public async Task ModifyObjectAsync(T entity)
         {
             if (entity != null)
             {
@@ -50,7 +50,7 @@ namespace FreelancerInvoicing.Repositories.Repositories
             }
         }
 
-        public async Task DeletObjAsync(int id)
+        public async Task DeletObjectAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity != null)

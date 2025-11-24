@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using FreelancerInvoicing.Models.Entities;
-using FreelancerInvoicing.Services.Users;
+using FreelancerInvoicing.Services.Interfaces;
 
 namespace FreelancerInvoicing.API.Controllers
 {
@@ -20,7 +20,7 @@ namespace FreelancerInvoicing.API.Controllers
         public async Task<ActionResult<IEnumerable<User>>> GetAll(int id)
         {
             ActionResult<IEnumerable<User>> result;
-            IEnumerable<User> users = await _userService.GetAllAsyncService();
+            IEnumerable<User> users = await _userService.GetAllServiceAsync();
             if (users == null)
             {
                 result = NotFound();
@@ -36,7 +36,7 @@ namespace FreelancerInvoicing.API.Controllers
         public async Task<ActionResult<User>> GetById(int id)
         {
             ActionResult<User> result;
-            User user = await _userService.GetObjByIdService(id);
+            User user = await _userService.GetObjectByIdServiceAsync(id);
             if (user == null)
             {
                 result = NotFound();
@@ -54,7 +54,7 @@ namespace FreelancerInvoicing.API.Controllers
             if (user == null)
                 return BadRequest();
 
-            await _userService.AddObjService(user);
+            await _userService.AddObjectServiceAsync(user);
 
             return CreatedAtAction(nameof(GetById), new { id = user.UserId }, user);
         }
@@ -65,22 +65,22 @@ namespace FreelancerInvoicing.API.Controllers
             if (user == null || user.UserId != id)
                 return BadRequest();
 
-            var existingUser = await _userService.GetObjByIdService(id);
+            var existingUser = await _userService.GetObjectByIdServiceAsync(id);
             if (existingUser == null)
                 return NotFound();
 
-            await _userService.ModifyObjService(user);
+            await _userService.ModifyObjectServiceAsync(user);
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var user = await _userService.GetObjByIdService(id);
+            var user = await _userService.GetObjectByIdServiceAsync(id);
             if (user == null)
                 return NotFound();
 
-            await _userService.DeletObjService(id);
+            await _userService.DeletObjectServiceAsync(id);
             return NoContent();
         }
     }

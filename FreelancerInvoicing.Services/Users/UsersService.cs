@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FreelancerInvoicing.Models.Entities;
-using FreelancerInvoicing.Models.Interfaces;
-using FreelancerInvoicing.Repositories.Repositories;
+using FreelancerInvoicing.Repositories;
+using FreelancerInvoicing.Repositories.Interfaces;
+using FreelancerInvoicing.Services.Interfaces;
 using FreelancerInvoicing.Services.Users.Tools;
 
 namespace FreelancerInvoicing.Services.Users
@@ -19,13 +20,10 @@ namespace FreelancerInvoicing.Services.Users
         }
         public virtual async Task AddObjService(User user)
         {
-            UserValidator.ValidateUserParameterMaxLength(user);
-            UserValidator.ValidateIfUserEmailNotAlreadyUsed(await _userRepository.GetAllAsync(), user.Email);
             await _userRepository.AddObjAsync(user);
         }
         public virtual async Task ModifyObjService(User user)
         {
-            UserValidator.ValidateUserParameterMaxLength(user);
             await _userRepository.ModifyObjAsync(user);
         }
 
