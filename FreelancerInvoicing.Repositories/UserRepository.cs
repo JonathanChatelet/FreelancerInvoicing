@@ -25,7 +25,7 @@ namespace FreelancerInvoicing.Repositories
             User result;
             try
             {
-                result = await _dbSet.SingleOrDefaultAsync(user => user.Email.ToLower() == email.ToLower());
+                result = await _dbSet.SingleOrDefaultAsync(user => user.Email == email);
             }
             catch (Exception ex) 
             {
@@ -38,7 +38,7 @@ namespace FreelancerInvoicing.Repositories
             User result;
             try
             {
-                result = await _dbSet.SingleOrDefaultAsync(user => user.Siret.ToLower() == siret.ToLower());
+                result = await _dbSet.SingleOrDefaultAsync(user => user.Siret == siret);
             }
             catch (Exception ex)
             {

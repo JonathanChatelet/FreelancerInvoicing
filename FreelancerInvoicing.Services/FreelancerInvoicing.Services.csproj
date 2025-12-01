@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="8.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FreelancerInvoicing.DTO\FreelancerInvoicing.DTO.csproj" />
     <ProjectReference Include="..\FreelancerInvoicing.Models\FreelancerInvoicing.Models.csproj" />
     <ProjectReference Include="..\FreelancerInvoicing.Repositories\FreelancerInvoicing.Repositories.csproj" />
   </ItemGroup>

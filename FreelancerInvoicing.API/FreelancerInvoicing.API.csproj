@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
@@ -28,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FreelancerInvoicing.DTO\FreelancerInvoicing.DTO.csproj" />
     <ProjectReference Include="..\FreelancerInvoicing.Models\FreelancerInvoicing.Models.csproj" />
     <ProjectReference Include="..\FreelancerInvoicing.Services\FreelancerInvoicing.Services.csproj" />
   </ItemGroup>

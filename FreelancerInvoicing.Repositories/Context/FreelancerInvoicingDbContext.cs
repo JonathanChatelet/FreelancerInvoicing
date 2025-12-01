@@ -122,6 +122,8 @@ public partial class FreelancerInvoicingDbContext : DbContext
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C7DFE8381");
 
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getdate())");
+
+            entity.HasQueryFilter(e => !e.IsDeleted);
         });
 
         OnModelCreatingPartial(modelBuilder);

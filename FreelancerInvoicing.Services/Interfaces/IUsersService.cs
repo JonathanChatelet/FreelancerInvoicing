@@ -14,5 +14,6 @@ namespace FreelancerInvoicing.Services.Interfaces
         Task<User> FindUserByEmailServiceAsync(String email);
         Task<User> FindUserBySiretServiceAsync(String siret);
         Task<IEnumerable<User>> FindUsersByNameServiceAsync(String name);
+        Task<User> CreateUserAsync(String email, String password);
     }
 }
