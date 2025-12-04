@@ -8,9 +8,11 @@ using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pag
 using Microsoft.AspNetCore.Http.HttpResults;
 using AutoMapper;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FreelancerInvoicing.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class UsersController : ControllerBase
@@ -25,146 +27,172 @@ namespace FreelancerInvoicing.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReadUserDTO>>> GetAll()
+        public async Task<ActionResult<IEnumerable<ReadUserDTO>>> GetAllAsync()
         {
-            ActionResult<IEnumerable<ReadUserDTO>> result;
-            try
+            if (await CurrentUserIsAdminAsync())
             {
-                IEnumerable<User> users = await _userService.GetAllObjectServiceAsync();
-
-                if (!users.Any())
+                ActionResult<IEnumerable<ReadUserDTO>> result;
+                try
                 {
-                    result = NotFound("No users found");
-                }
-                else
-                {
-                    var readUsers = _mapper.Map<IEnumerable<ReadUserDTO>>(users);
-                    result = Ok(readUsers);
-                }
+                    IEnumerable<User> users = await _userService.GetAllObjectServiceAsync();
 
-                return result;
-                
+                    if (!users.Any())
+                    {
+                        result = NotFound("No users found");
+                    }
+                    else
+                    {
+                        var readUsers = _mapper.Map<IEnumerable<ReadUserDTO>>(users);
+                        result = Ok(readUsers);
+                    }
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, new { error = ex.Message });
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, new { error = ex.Message });
+                return Forbid("You must be an admin");
             }
-         
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<ReadUserDTO>> GetById(int id)
+        public async Task<ActionResult<ReadUserDTO>> GetByIdAsync(int id)
         {
-            ActionResult<ReadUserDTO> result;
-            try
+            if (await CurrentUserIsAdminAsync())
             {
-                User user = await _userService.GetObjectByIdServiceAsync(id);
-
-                if (user == null)
+                ActionResult<ReadUserDTO> result;
+                try
                 {
-                    result = NotFound();
-                }
-                else
-                {
-                    result = Ok(_mapper.Map<ReadUserDTO>(user));
-                }
+                    User user = await _userService.GetObjectByIdServiceAsync(id);
 
-                return result;
+                    if (user == null)
+                    {
+                        result = NotFound();
+                    }
+                    else
+                    {
+                        result = Ok(_mapper.Map<ReadUserDTO>(user));
+                    }
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                return Forbid("You must be an admin");
             }
         }
-
+    
         [HttpGet("{email}")]
-        public async Task<ActionResult<ReadUserDTO>> GetByEmail(String email)
+        public async Task<ActionResult<ReadUserDTO>> GetByEmailAsync(String email)
         {
-            ActionResult<ReadUserDTO> result;
-            try
+            if (await CurrentUserIsAdminAsync())
             {
-                User user = await _userService.FindUserByEmailServiceAsync(email);
-                if (user == null)
+                ActionResult<ReadUserDTO> result;
+                try
                 {
-                    result = NotFound();
+                    User user = await _userService.FindUserByEmailServiceAsync(email);
+                    if (user == null)
+                    {
+                        result = NotFound();
+                    }
+                    else
+                    {
+                        result = Ok(_mapper.Map<ReadUserDTO>(user));
+                    }
+                    return result;
                 }
-                else
+                catch (InvalidOperationException iOpEx)
                 {
-                    result = Ok(_mapper.Map<ReadUserDTO>(user));
+                    result = Conflict(iOpEx.Message);
+                    return result;
                 }
-
-                return result;
-                
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                }
             }
-            catch (InvalidOperationException iOpEx)
+            else
             {
-                result = Conflict(iOpEx.Message);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                return Forbid("You must be an admin");
             }
         }
 
         [HttpGet("{siret}")]
-        public async Task<ActionResult<ReadUserDTO>> GetBySiret(String siret)
+        public async Task<ActionResult<ReadUserDTO>> GetBySiretAsync(String siret)
         {
-            ActionResult<ReadUserDTO> result;
-            try
+            if (await CurrentUserIsAdminAsync())
             {
-                User user = await _userService.FindUserBySiretServiceAsync(siret);
-                if (user == null)
+                ActionResult<ReadUserDTO> result;
+                try
                 {
-                    result = NotFound();
+                    User user = await _userService.FindUserBySiretServiceAsync(siret);
+                    if (user == null)
+                    {
+                        result = NotFound();
+                    }
+                    else
+                    {
+                        result = Ok(_mapper.Map<ReadUserDTO>(user));
+                    }
+                    return result;
                 }
-                else
+                catch (InvalidOperationException iOpEx)
                 {
-                    result = Ok(_mapper.Map<ReadUserDTO>(user));
+                    return Conflict(iOpEx.Message);
                 }
-
-                return result;
-
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                }
             }
-            catch (InvalidOperationException iOpEx)
+            else
             {
-                return Conflict(iOpEx.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                return Forbid("You must be an admin");
             }
         }
 
         [HttpGet("{name}")]
-        public async Task<ActionResult<IEnumerable<ReadUserDTO>>> GetByName(String name)
+        public async Task<ActionResult<IEnumerable<ReadUserDTO>>> GetByNameAsync(String name)
         {
-            ActionResult<IEnumerable<ReadUserDTO>> result;
-            try
+            if (await CurrentUserIsAdminAsync())
             {
-                IEnumerable<User> users = await _userService.FindUsersByNameServiceAsync(name);
-
-                if (!users.Any())
+                ActionResult<IEnumerable<ReadUserDTO>> result;
+                try
                 {
-                    result = NotFound("No users found");
+                    IEnumerable<User> users = await _userService.FindUsersByNameServiceAsync(name);
+
+                    if (!users.Any())
+                    {
+                        result = NotFound("No users found");
+                    }
+                    else
+                    {
+                        IEnumerable<ReadUserDTO> readUsers = _mapper.Map<IEnumerable<ReadUserDTO>>(users);
+                        result = Ok(readUsers);
+                    }
+                    return result;
                 }
-                else
+                catch (Exception ex)
                 {
-                    IEnumerable<ReadUserDTO> readUsers = _mapper.Map<IEnumerable<ReadUserDTO>>(users);
-                    result = Ok(readUsers);
+                    return StatusCode(500, new { error = ex.Message });
                 }
-
-                return result;
-
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, new { error = ex.Message });
+                return Forbid("You must be an admin");
             }
         }
 
+        [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CreateUserDto createUserDTO)
+        public async Task<IActionResult> CreateAsync([FromBody] CreateUserDto createUserDTO)
         {
             ActionResult result;
             try
@@ -176,7 +204,7 @@ namespace FreelancerInvoicing.API.Controllers
                 else
                 {
                     await _userService.AddObjectServiceAsync(_mapper.Map<User>(createUserDTO));
-                    result =  CreatedAtAction(nameof(GetById), new { id = createUserDTO.UserId }, createUserDTO);
+                    result =  CreatedAtAction(nameof(GetByIdAsync), new { id = createUserDTO.UserId }, createUserDTO);
                 }
                 return result;
             }
@@ -187,29 +215,138 @@ namespace FreelancerInvoicing.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDTO updateUserDTO)
+        public async Task<IActionResult> UpdateAsync(int id, [FromBody] UpdateUserDTO updateUserDTO)
         {
-            ActionResult result;
-            try
+            if (await CurrentUserIsAdminAsync())
             {
-                if (updateUserDTO == null)
-                { 
-                    result = BadRequest();
-                }
-                else
+                ActionResult result;
+                try
                 {
-                    User existingUser = await _userService.GetObjectByIdServiceAsync(id);
-                    if (existingUser == null)
+                    if (updateUserDTO == null)
+                    { 
+                        result = BadRequest();
+                    }
+                    else
+                    {
+                        User existingUser = await _userService.GetObjectByIdServiceAsync(id);
+                        if (existingUser == null)
+                        {
+                            result = NotFound();
+                        }
+                        else
+                        {
+                            await _userService.ModifyObjectServiceAsync(_mapper.Map<User>(updateUserDTO));
+                            result = NoContent();
+                        }
+                    }
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                }
+            }
+            else
+            {
+                return Forbid("You must be an admin");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAsync(int id)
+        {
+            if (await CurrentUserIsAdminAsync())
+            {
+                ActionResult result;
+                try
+                {
+                    var user = await _userService.GetObjectByIdServiceAsync(id);
+                    if (user == null)
                     {
                         result = NotFound();
                     }
                     else
                     {
-                        await _userService.ModifyObjectServiceAsync(_mapper.Map<User>(updateUserDTO));
+                        await _userService.DeletObjectServiceAsync(id);
                         result = NoContent();
                     }
-                    
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                }
+            }
+            else
+            {
+                return Forbid("You must be an admin");
+            }
+        }
 
+        [HttpPut]
+        public async Task<IActionResult> SoftDeleteAsync(int id)
+        {
+            if (await CurrentUserIsAdminAsync())
+            {
+                ActionResult result;
+                try
+                {
+                    var user = await _userService.GetObjectByIdServiceAsync(id);
+                    if (user == null)
+                    {
+                        result = NotFound();
+                    }
+                    else
+                    {
+                        user.IsDeleted = true;
+                        await _userService.ModifyObjectServiceAsync(user);
+                        result = NoContent();
+                    }
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                }
+            }
+            else
+            {
+                return Forbid("You must be an admin");
+            }
+        }
+
+        [HttpGet]
+        private async Task<ActionResult<ReadUserDTO>> GetMyInfoAsync() 
+        {
+            ActionResult<ReadUserDTO> result;
+            User? user = await GetCurrentUserAsync();
+            if(user == null)
+            {
+                result = NotFound("No users connected");
+            }
+            else
+            {
+                ReadUserDTO readUser = _mapper.Map<ReadUserDTO>(user);
+                result = Ok(readUser);
+            }
+            return result;
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateMyInfoAsync([FromBody] UpdateUserDTO updateUserDTO)
+        {
+            ActionResult result;
+            int currentId = (await GetCurrentUserAsync()).UserId;
+            try
+            {
+                if (updateUserDTO == null)
+                {
+                    result = BadRequest();
+                }
+                else
+                {
+                    await _userService.ModifyObjectServiceAsync(_mapper.Map<User>(updateUserDTO));
+                    result = NoContent();
                 }
                 return result;
             }
@@ -217,25 +354,38 @@ namespace FreelancerInvoicing.API.Controllers
             {
                 return StatusCode(500, $"Erreur serveur : {ex.Message}");
             }
+            return result;
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        private async Task<User?> GetCurrentUserAsync() 
         {
-            try
+            User user;
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
             {
-                var user = await _userService.GetObjectByIdServiceAsync(id);
-                if (user == null)
-                    return NotFound();
-
-                await _userService.DeletObjectServiceAsync(id);
-                return NoContent();
+                user = null;
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, $"Erreur serveur : {ex.Message}");
+                user = await _userService.GetObjectByIdServiceAsync(userId.Value);
             }
+            return user;
         }
-        
+
+        private async Task<bool> CurrentUserIsAdminAsync()
+        {
+            User? currentUser = await GetCurrentUserAsync();
+            bool result;
+            if (currentUser == null)
+            {
+                result = false;
+            }
+            else
+            {
+                result = currentUser.IsAdmin;
+            }
+            return result;
+        }
+
     }
 }
