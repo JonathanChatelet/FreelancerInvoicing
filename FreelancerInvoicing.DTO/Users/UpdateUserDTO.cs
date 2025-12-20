@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,18 @@ namespace FreelancerInvoicing.DTO.Users
 {
     public class UpdateUserDTO
     {
+        [Required(ErrorMessage = "ID is required.")]
+        public int UserId { get; set; }
+
         [MaxLength(50, ErrorMessage = "Name must be less than 50 caracters")]
         public string? Name { get; set; }
 
         [MaxLength(300, ErrorMessage = "Adress must be less than 300 caracters")]
         public string? Address { get; set; }
+
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Email format is invalid.")]
+        public string? Email { get; set; }
 
         [RegularExpression(@"^\d{14}$", ErrorMessage = "SIRET must contain exactly 14 digits.")]
         public string? Siret { get; set; }
@@ -23,5 +31,6 @@ namespace FreelancerInvoicing.DTO.Users
 
         [MaxLength(11, ErrorMessage = "SWIFT must be less than 11 caracters")]
         public string? Swift { get; set; }
+        public bool IsDelete { get; set; }
     }
 }

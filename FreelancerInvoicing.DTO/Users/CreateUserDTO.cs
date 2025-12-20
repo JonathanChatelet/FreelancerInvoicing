@@ -20,5 +20,8 @@ namespace FreelancerInvoicing.DTO.Users
         [MinLength(8, ErrorMessage = "Password must contain at least 8 characters.")]
         [RegularExpression(@" ^ (?=.* [^A - Za - z0 - 9])\S + $", ErrorMessage = "Password must contain at least one spacial caracter and no space.")]
         public string Password { get; set; } = string.Empty;
+
+        [RegularExpression(@"^\d{14}$", ErrorMessage = "SIRET must contain exactly 14 digits.")]
+        public string? Siret { get; set; }
     }
 }

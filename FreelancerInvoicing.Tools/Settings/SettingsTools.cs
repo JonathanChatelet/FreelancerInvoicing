@@ -29,5 +29,10 @@ namespace FreelancerInvoicing.Tools.Settings
             return _configuration.GetSection("AppSettings").Get<AppSettings>();
         }
 
+        public static JWTSettings GetJWT()
+        {
+            return _configuration.GetSection("JWT").Get<JWTSettings>();
+        }
+
     }
 }

@@ -8,9 +8,10 @@ using FreelancerInvoicing.Repositories.Interfaces;
 
 namespace FreelancerInvoicing.Services.Interfaces
 {
-    public interface IAuthentificationService 
+    public interface IAuthenticationService 
     {
         string HashPassword(User user, string password);
         bool VerifyPassword(User user, string enteredPassword);
+        string GenerateToken(User user);
     }
 }

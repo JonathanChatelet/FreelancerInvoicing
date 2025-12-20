@@ -13,9 +13,11 @@ namespace FreelancerInvoicing.Services.Mappings
     {
         public CreateUserProfile()
         {
+            CreateMap<User, ReadMyInfoDTO>();
             CreateMap<User, ReadUserDTO>();
-            CreateMap<CreateUserDto, User>();
-            CreateMap<UpdateUserDTO, User>();
+            CreateMap<CreateUserDto, User>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null)); 
+            CreateMap<UpdateMyInfoDTO, User>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null)); 
+            CreateMap<UpdateUserDTO, User>().ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

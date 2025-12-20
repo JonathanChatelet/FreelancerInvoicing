@@ -15,6 +15,7 @@
     <ProjectReference Include="..\FreelancerInvoicing.DTO\FreelancerInvoicing.DTO.csproj" />
     <ProjectReference Include="..\FreelancerInvoicing.Models\FreelancerInvoicing.Models.csproj" />
     <ProjectReference Include="..\FreelancerInvoicing.Repositories\FreelancerInvoicing.Repositories.csproj" />
+    <ProjectReference Include="..\FreelancerInvoicing.Tools\FreelancerInvoicing.Tools.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using FreelancerInvoicing.Models.Entities;
+using FreelancerInvoicing.Repositories.Context;
 using FreelancerInvoicing.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,49 +13,32 @@ namespace FreelancerInvoicing.Repositories
 {
     public class UserRepository : ObjectRepository<User>, IUserRepository
     {
-        private readonly DbContext _context;
-        private readonly DbSet<User> _dbSet;
-
-        public UserRepository(DbContext context) : base(context) 
+        public UserRepository(FreelancerInvoicingDbContext context, IMapper mapper) : base(context, mapper)
         {
-            _context = context;
-            _dbSet = context.Set<User>();
         }
 
-        public async Task<User> FindUserByEmailAsync (String email) 
+        public async Task<User?> FindUserByEmailAsync (String email) 
         {
-            User result;
-            try
-            {
-                result = await _dbSet.SingleOrDefaultAsync(user => user.Email == email);
-            }
-            catch (Exception ex) 
-            {
-                throw new InvalidOperationException($"error : many users with same email ({email}) in the database");
-            }
-            return result;
+            return await _dbSet.SingleOrDefaultAsync(user => user.Email == email);
         }
-        public async Task<User> FindUserBySiretAsync(String siret)
+        public async Task<User?> FindUserBySiretAsync(String siret)
         {
-            User result;
-            try
-            {
-                result = await _dbSet.SingleOrDefaultAsync(user => user.Siret == siret);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"error : many users with same SIRET ({siret}) in the database");
-            }
-            return result;
+            return await _dbSet.SingleOrDefaultAsync(user => user.Siret == siret);
         }
-
         public async Task<IEnumerable<User>> FindUsersByNameAsync(String name)
         {
-            IEnumerable<User> results;
-            
-            results = await _dbSet.Where(user => user.Name.ToLower().Contains(name.ToLower())).ToListAsync();
-            
-            return results;
+            return await _dbSet.Where(user => user.Name.ToLower().Contains(name.ToLower())).ToListAsync();
+        }
+        public async Task<bool> ModifyUserAsync(User user)
+        {
+            User? existingUser = await GetObjectByIdAsync(user.UserId);
+            if(existingUser == null) 
+            {
+                return false;
+            }
+            //_dbSet.Update(user);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 

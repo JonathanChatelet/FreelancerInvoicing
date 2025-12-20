@@ -8,6 +8,6 @@ namespace FreelancerInvoicing.Tools.Settings
 {
     public class DataBaseConnectionSettings
     {
-        public string FreelanceInvoicingDataBase { get; set; }
+        public string FreelancerInvoicingDataBase { get; set; }
     }
 }

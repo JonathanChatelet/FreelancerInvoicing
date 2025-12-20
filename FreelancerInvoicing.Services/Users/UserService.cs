@@ -10,31 +10,31 @@ using FreelancerInvoicing.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
+using FreelancerInvoicing.DTO.Users;
+using AutoMapper;
 
 namespace FreelancerInvoicing.Services.Users
 {
-    public class UsersService : BaseService<User>, IUsersService
+    public class UserService : BaseService<User>, IUserService, IUserReadOnlyService
     {
         private IUserRepository _userRepository;
-        private IAuthentificationService _authentificationService;
+        private IAuthenticationService _authentificationService;
+        protected readonly IMapper _mapper;
         private readonly PasswordHasher<User> _passwordHasher = new();
-        public UsersService(IUserRepository userRepository, IAuthentificationService authentificationService) : base(userRepository) 
+        public UserService(IUserRepository userRepository, IAuthenticationService authentificationService, IMapper mapper) : base(userRepository) 
         {
             _userRepository = userRepository;
             _authentificationService = authentificationService;
+            _mapper = mapper;
         }
 
-        public async Task<User> FindUserByEmailServiceAsync(String email)
+        public async Task<User?> FindUserByEmailServiceAsync(String email)
         {
-            User result;
-            result = await _userRepository.FindUserByEmailAsync(email);
-            return result;
+            return await _userRepository.FindUserByEmailAsync(email);
         }
-        public async Task<User> FindUserBySiretServiceAsync(String siret)
+        public async Task<User?> FindUserBySiretServiceAsync(String siret)
         {
-            User result;
-            result = await _userRepository.FindUserBySiretAsync(siret);
-            return result;
+            return await _userRepository.FindUserBySiretAsync(siret); 
         }
 
         public async Task<IEnumerable<User>> FindUsersByNameServiceAsync(String name)
@@ -44,10 +44,22 @@ namespace FreelancerInvoicing.Services.Users
             return results;
         }
 
-        public async Task<User> CreateUserAsync(String email, String password)
+        public async Task<bool> ModifyUserServiceAsync(User user)
+        {
+            User? userRead = await _userRepository.GetObjectByIdAsync(user.UserId);
+            if (userRead == null)
+            {
+                return false;
+            }
+
+            return await _userRepository.ModifyUserAsync(user);
+        }
+
+        public async Task<User> CreateUserAsync(String email, String password, String siret)
         {
             await VerifyIfEmailIsCorrectAsync(email);
             VerifyIfPasswordIsCorrect(password);
+            await VerifySiretAsync(siret);
             User user = new User();
             user.Email = email;
             user.PasswordHash = _authentificationService.HashPassword(user, password);
@@ -84,6 +96,18 @@ namespace FreelancerInvoicing.Services.Users
             else if (password.Any(c => char.IsWhiteSpace(c)))
             {
                 throw new InvalidOperationException("Space(s) are forbidden in password.");
+            }
+        }
+
+        private async Task VerifySiretAsync(String siret)
+        {
+            if(siret.Length != 14)
+            {
+                throw new InvalidOperationException("Siret must contain 14 caracters");
+            }
+            else if (await _userRepository.FindUserBySiretAsync(siret) != null)
+            {
+                throw new InvalidOperationException("This Siret is already used.");
             }
         }
     }

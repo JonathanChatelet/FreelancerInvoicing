@@ -10,9 +10,9 @@ namespace FreelancerInvoicing.Repositories.Interfaces
     public interface IObjectRepository<T> where T : class
     {
         Task<IEnumerable<T>> GetAllObjectAsync();
-        Task<T> GetObjectByIdAsync(int id);
+        Task<T?> GetObjectByIdAsync(int id);
         Task AddObjectAsync(T entity);
         Task ModifyObjectAsync(T entity);
-        Task DeletObjectAsync(int id);
+        Task DeletObjectAsync(T entity);
     }
 }

@@ -9,8 +9,9 @@ namespace FreelancerInvoicing.Repositories.Interfaces
 {
     public interface IUserRepository : IObjectRepository<User>
     {
-        Task<User> FindUserByEmailAsync(String email);
-        Task<User> FindUserBySiretAsync(String siret);
+        Task<User?> FindUserByEmailAsync(String email);
+        Task<User?> FindUserBySiretAsync(String siret);
         Task<IEnumerable<User>> FindUsersByNameAsync(String name);
+        Task<bool> ModifyUserAsync(User user);
     }
 }

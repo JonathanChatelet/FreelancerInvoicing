@@ -6,18 +6,24 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using FreelancerInvoicing.Models.Entities;
 using FreelancerInvoicing.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using AutoMapper;
+using System.Linq.Expressions;
+using FreelancerInvoicing.Repositories.Context;
 
 namespace FreelancerInvoicing.Repositories
 {
     public class ObjectRepository<T> : IObjectRepository<T> where T : class
     {
 
-        private readonly DbContext _context;
-        private readonly DbSet<T> _dbSet;
+        protected readonly FreelancerInvoicingDbContext _context;
+        protected readonly IMapper _mapper;        
+        protected readonly DbSet<T> _dbSet;
 
-        public ObjectRepository(DbContext context)
+        public ObjectRepository(FreelancerInvoicingDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
             _dbSet = context.Set<T>();
         }
 
@@ -26,7 +32,7 @@ namespace FreelancerInvoicing.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T> GetObjectByIdAsync(int id)
+        public async Task<T?> GetObjectByIdAsync(int id)
         {
             return await _dbSet.FindAsync(id);
         }
@@ -39,29 +45,14 @@ namespace FreelancerInvoicing.Repositories
 
         public async Task ModifyObjectAsync(T entity)
         {
-            if (entity != null)
-            {
-                _dbSet.Update(entity);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                throw new KeyNotFoundException($"{entity.GetType} not found.");
-            }
+            //_dbSet.Update(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task DeletObjectAsync(int id)
+        public async Task DeletObjectAsync(T entity)
         {
-            var entity = await _dbSet.FindAsync(id);
-            if (entity != null)
-            {
-                _dbSet.Remove(entity);
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                throw new KeyNotFoundException($"Entity with id {id} not found.");
-            }
+            _dbSet.Remove(entity);
+            await _context.SaveChangesAsync();
         }
     }
 }

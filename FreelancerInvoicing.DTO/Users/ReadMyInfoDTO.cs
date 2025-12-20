@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FreelancerInvoicing.DTO.Users
 {
-    public class ReadUserDTO
+    public class ReadMyInfoDTO
     {
-        [Required(ErrorMessage = "ID is required.")]
+        [Required(ErrorMessage = "ID is required.")] 
         public int UserId { get; set; }
 
         [MaxLength(50, ErrorMessage = "Name must be less than 50 caracters")]
@@ -31,10 +31,5 @@ namespace FreelancerInvoicing.DTO.Users
 
         [MaxLength(11, ErrorMessage = "SWIFT must be less than 11 caracters")]
         public string? Swift { get; set; }
-        
-        public DateTime? CreatedAt { get; set; }
-
-        public bool IsAdmin { get; set; }
-        public bool IsDeleted { get; set; }
     }
 }
