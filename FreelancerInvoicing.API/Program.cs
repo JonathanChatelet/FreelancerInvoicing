@@ -14,8 +14,23 @@ using FreelancerInvoicing.Models.Entities;
 using FreelancerInvoicing.Services.Authentication;
 using IAuthenticationServiceAlias = FreelancerInvoicing.Services.Interfaces.IAuthenticationService;
 using Microsoft.AspNetCore.Identity;
+using Serilog;
+using FreelancerInvoicing.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.File(
+        path: "Logs/log-.txt",
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 30,
+        outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}"
+    )
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
 builder.Services.AddControllers();
 
 
@@ -94,6 +109,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

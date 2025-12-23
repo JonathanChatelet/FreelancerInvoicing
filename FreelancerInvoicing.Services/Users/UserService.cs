@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
 using FreelancerInvoicing.DTO.Users;
 using AutoMapper;
+using FreelancerInvoicing.Tools.Exceptions;
 
 namespace FreelancerInvoicing.Services.Users
 {
@@ -69,45 +70,49 @@ namespace FreelancerInvoicing.Services.Users
         private async Task VerifyIfEmailIsCorrectAsync(String email)
         {
             string emailPattern = @"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4}$";
-            if (email == null)
+            if (string.IsNullOrWhiteSpace(email))
             {
-                throw new InvalidOperationException("Email can't be null.");
+                throw new BusinessException("Email can't be null or empty.", 400);
             }
             else if (!Regex.IsMatch(email, emailPattern))
             {
-                throw new InvalidOperationException("Please insert a correct email adress.");
+                throw new BusinessException("Please insert a correct email address.", 400);
             }
             else if (await _userRepository.FindUserByEmailAsync(email) != null)
             {
-                throw new InvalidOperationException("This email adress is already used.");
+                throw new BusinessException("This email adress is already used.", 409);
             }
         }
 
         private void VerifyIfPasswordIsCorrect(String password) 
         {
-            if (string.IsNullOrEmpty(password) || password.Length < 8)
+            if (string.IsNullOrWhiteSpace(password) || password.Length < 8)
             {
-                throw new InvalidOperationException("Password is to short.");
+                throw new BusinessException("Password is too short.",400);
             }
             else if (password.All(char.IsLetterOrDigit))
             {
-                throw new InvalidOperationException("Password must contain at least one special caracter.");
+                throw new BusinessException("Password must contain at least one special caracter.", 400);
             }
             else if (password.Any(c => char.IsWhiteSpace(c)))
             {
-                throw new InvalidOperationException("Space(s) are forbidden in password.");
+                throw new BusinessException("Space(s) are forbidden in password.", 400);
             }
         }
 
         private async Task VerifySiretAsync(String siret)
         {
-            if(siret.Length != 14)
+            if (string.IsNullOrWhiteSpace(siret))
             {
-                throw new InvalidOperationException("Siret must contain 14 caracters");
+                throw new BusinessException("Siret can't be null or empty.", 400);
+            }
+            else if (siret.Length != 14)
+            {
+                throw new BusinessException("Siret must contain 14 characters", 400);
             }
             else if (await _userRepository.FindUserBySiretAsync(siret) != null)
             {
-                throw new InvalidOperationException("This Siret is already used.");
+                throw new BusinessException("This Siret is already used.", 409);
             }
         }
     }

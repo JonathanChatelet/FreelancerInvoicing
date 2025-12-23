@@ -15,5 +15,9 @@ namespace FreelancerInvoicing.DTO.Users
 
         [Required(ErrorMessage = "ID is required.")]
         public string Password { get; set; }
+
+        [Required(ErrorMessage = "Siret is required.")]
+        [StringLength(14)]
+        public string? Siret { get; set; }
     }
 }

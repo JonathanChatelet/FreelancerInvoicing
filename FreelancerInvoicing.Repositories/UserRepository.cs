@@ -13,8 +13,10 @@ namespace FreelancerInvoicing.Repositories
 {
     public class UserRepository : ObjectRepository<User>, IUserRepository
     {
+        private readonly IMapper _mapper;
         public UserRepository(FreelancerInvoicingDbContext context, IMapper mapper) : base(context, mapper)
         {
+            _mapper = mapper;
         }
 
         public async Task<User?> FindUserByEmailAsync (String email) 
@@ -27,7 +29,7 @@ namespace FreelancerInvoicing.Repositories
         }
         public async Task<IEnumerable<User>> FindUsersByNameAsync(String name)
         {
-            return await _dbSet.Where(user => user.Name.ToLower().Contains(name.ToLower())).ToListAsync();
+            return await _dbSet.Where(u => EF.Functions.Like(u.Name.ToLower(), $"%{name.ToLower()}%")).ToListAsync();
         }
         public async Task<bool> ModifyUserAsync(User user)
         {
@@ -36,6 +38,7 @@ namespace FreelancerInvoicing.Repositories
             {
                 return false;
             }
+            _mapper.Map(user, existingUser);
             //_dbSet.Update(user);
             await _context.SaveChangesAsync();
             return true;

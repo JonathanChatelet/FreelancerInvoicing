@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using AutoMapper;
 using Humanizer;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace FreelancerInvoicing.API.Controllers
 {
@@ -26,8 +27,8 @@ namespace FreelancerInvoicing.API.Controllers
             _mapper = mapper;
         }
 
-        private int currentUserId => int.Parse(User.FindFirst("id")?.Value ?? "0");
-        private bool currentUserIsAdmin => User.FindFirst("isAdmin")?.Value == "true";
+        private int currentUserId => int.Parse(User.FindFirstValue("id") ?? "0");
+        private bool currentUserIsAdmin => bool.Parse(User.FindFirstValue("isAdmin") ?? "false");
 
 
         [HttpGet]
@@ -35,10 +36,10 @@ namespace FreelancerInvoicing.API.Controllers
         {
             if (!currentUserIsAdmin)
             {
-                return Forbid("You must be an admin");
+                return StatusCode(403, "You must be an admin");
             }
             IEnumerable<User> users = await _userService.GetAllObjectServiceAsync();
-            return Ok(_mapper.Map<IEnumerable<ReadUserDTO>>(users));
+            return !users.Any() ? NotFound() : Ok(_mapper.Map<IEnumerable<ReadUserDTO>>(users));
         }
 
         [HttpGet("{id}")]
@@ -46,9 +47,9 @@ namespace FreelancerInvoicing.API.Controllers
         {
             if (!currentUserIsAdmin)
             {
-                return Forbid("You must be an admin");
+                return StatusCode(403, "You must be an admin");
             }
-            User? user = await _userService.GetObjectByIdServiceAsync(id);
+            User user = await _userService.GetObjectByIdServiceAsync(id);
             return user == null ? NotFound() : Ok(_mapper.Map<ReadUserDTO>(user));
         }
 
@@ -57,9 +58,9 @@ namespace FreelancerInvoicing.API.Controllers
         {
             if (!currentUserIsAdmin)
             {
-                return Forbid("You must be an admin");
+                return StatusCode(403, "You must be an admin");
             }
-            User? user = await _userService.FindUserByEmailServiceAsync(email);
+            User user = await _userService.FindUserByEmailServiceAsync(email);
             return user == null ? NotFound() : Ok(_mapper.Map<ReadUserDTO>(user));
         }
 
@@ -68,9 +69,9 @@ namespace FreelancerInvoicing.API.Controllers
         {
             if (!currentUserIsAdmin)
             {
-                return Forbid("You must be an admin");
+                return StatusCode(403, "You must be an admin");
             }
-            User? user = await _userService.FindUserByEmailServiceAsync(siret);
+            User user = await _userService.FindUserBySiretServiceAsync(siret);
             return user == null ? NotFound() : Ok(_mapper.Map<ReadUserDTO>(user));
         }
 
@@ -79,18 +80,18 @@ namespace FreelancerInvoicing.API.Controllers
         {
             if (!currentUserIsAdmin)
             {
-                return Forbid("You must be an admin");
+                return StatusCode(403, "You must be an admin");
             }
-            User? user = await _userService.FindUserByEmailServiceAsync(name);
-            return user == null ? NotFound() : Ok(_mapper.Map<ReadUserDTO>(user));
+            IEnumerable<User> users = await _userService.FindUsersByNameServiceAsync(name);
+            return !users.Any() ? NotFound() : Ok(_mapper.Map<IEnumerable<ReadUserDTO>>(users));
         }
 
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> CreateAsync([FromBody] CreateUserDto createUserDTO)
         {
-            await _userService.AddObjectServiceAsync(_mapper.Map<User>(createUserDTO));
-            return CreatedAtAction(nameof(GetByIdAsync), new { id = createUserDTO.UserId }, createUserDTO);
+            User user = await _userService.CreateUserAsync(createUserDTO.Email, createUserDTO.Password, createUserDTO.Siret);
+            return CreatedAtAction(nameof(GetByIdAsync), new { id = user.UserId }, _mapper.Map<ReadUserDTO>(user));
         }
 
         [HttpPut("{id}")]
@@ -98,9 +99,9 @@ namespace FreelancerInvoicing.API.Controllers
         {
             if (!currentUserIsAdmin)
             {
-                return Forbid("You must be an admin");
+                return StatusCode(403, "You must be an admin");
             }
-            User? user = await _userService.GetObjectByIdServiceAsync(id);
+            User user = await _userService.GetObjectByIdServiceAsync(id);
             if (user == null) 
             {
                 return NotFound();
@@ -115,7 +116,7 @@ namespace FreelancerInvoicing.API.Controllers
         {
             if (!currentUserIsAdmin)
             {
-                return Forbid("You must be an admin");
+                return StatusCode(403, "You must be an admin");
             }
             bool result = await _userService.DeletObjectServiceAsync(id);
             return result == false ? NotFound() : NoContent();
@@ -124,14 +125,14 @@ namespace FreelancerInvoicing.API.Controllers
         [HttpGet("me")]
         public async Task<ActionResult<ReadMyInfoDTO>> GetMyInfoAsync()
         {
-            User? user = await _userService.GetObjectByIdServiceAsync(currentUserId);
+            User user = await _userService.GetObjectByIdServiceAsync(currentUserId);
             return user == null ? NotFound() : Ok(_mapper.Map<ReadMyInfoDTO>(user));
         }
 
         [HttpPut("me")]
         public async Task<IActionResult> UpdateMyInfoAsync([FromBody] UpdateMyInfoDTO updateMyInfoDTO)
         {
-            User? user = await _userService.GetObjectByIdServiceAsync(currentUserId);
+            User user = await _userService.GetObjectByIdServiceAsync(currentUserId);
             if (user == null)
             {
                 return NotFound();
