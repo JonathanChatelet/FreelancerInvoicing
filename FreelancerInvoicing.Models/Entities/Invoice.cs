@@ -13,7 +13,7 @@ public partial class Invoice
 
     public int UserId { get; set; }
 
-    public int CostumerId { get; set; }
+    public int CustomerId { get; set; }
 
     public int? QuoteId { get; set; }
 
@@ -28,9 +28,9 @@ public partial class Invoice
 
     public int Status { get; set; }
 
-    [ForeignKey("CostumerId")]
+    [ForeignKey("CustomerId")]
     [InverseProperty("Invoices")]
-    public virtual Costumer Costumer { get; set; } = null!;
+    public virtual Customer Customer { get; set; } = null!;
 
     [InverseProperty("Invoice")]
     public virtual ICollection<InvoiceLine> InvoiceLines { get; set; } = new List<InvoiceLine>();

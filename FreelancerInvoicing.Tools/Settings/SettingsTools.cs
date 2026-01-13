@@ -14,7 +14,7 @@ namespace FreelancerInvoicing.Tools.Settings
         static SettingsTools()
         {
             _configuration = new ConfigurationBuilder()
-                .SetBasePath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\..\\FreelancerInvoicing.Tools\\Settings"))
+                .SetBasePath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\..\\FreelancerInvoicing.API"))
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
         }
@@ -27,6 +27,11 @@ namespace FreelancerInvoicing.Tools.Settings
         public static AppSettings GetAppSettings()
         {
             return _configuration.GetSection("AppSettings").Get<AppSettings>();
+        }
+
+        public static JWTSettings GetJWT()
+        {
+            return _configuration.GetSection("JWT").Get<JWTSettings>();
         }
 
     }

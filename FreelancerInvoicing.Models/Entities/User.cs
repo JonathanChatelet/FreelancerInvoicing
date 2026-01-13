@@ -38,8 +38,11 @@ public partial class User
     [Column(TypeName = "datetime")]
     public DateTime? CreatedAt { get; set; }
 
+    public bool IsAdmin { get; set; }
+    public bool IsDeleted { get; set; }
+
     [InverseProperty("User")]
-    public virtual ICollection<Costumer> Costumers { get; set; } = new List<Costumer>();
+    public virtual ICollection<Customer> Customers { get; set; } = new List<Customer>();
 
     [InverseProperty("User")]
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
