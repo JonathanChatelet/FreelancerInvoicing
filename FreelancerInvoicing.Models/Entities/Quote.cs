@@ -26,9 +26,9 @@ public partial class Quote
 
     public int Status { get; set; }
 
-    [ForeignKey("CostumerId")]
+    [ForeignKey("CustomerId")]
     [InverseProperty("Quotes")]
-    public virtual Costumer Costumer { get; set; } = null!;
+    public virtual Customer Customer { get; set; } = null!;
 
     [InverseProperty("Quote")]
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();

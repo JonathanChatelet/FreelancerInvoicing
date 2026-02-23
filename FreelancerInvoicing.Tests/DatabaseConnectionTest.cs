@@ -12,8 +12,7 @@ namespace FreelancerInvoicing.Tests
             DataBaseConnectionSettings dataBaseConnectionSettings = new DataBaseConnectionSettings();
             dataBaseConnectionSettings = SettingsTools.GetDataBaseConnectionSettings();
             DbContextOptionsBuilder<FreelancerInvoicingDbContext> optionsBuilder = new DbContextOptionsBuilder<FreelancerInvoicingDbContext>();
-            optionsBuilder.UseSqlServer(dataBaseConnectionSettings.FreelanceInvoicingDataBase);
-
+            optionsBuilder.UseSqlServer(dataBaseConnectionSettings.FreelancerInvoicingDataBase);
             using var context = new FreelancerInvoicingDbContext(optionsBuilder.Options);
             Assert.True(context.Database.CanConnect());
         }
